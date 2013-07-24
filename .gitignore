@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Raw Sensor Data Sample/C#/sdkRawSensorDataCS/Bin/Debug
+/Raw Sensor Data Sample/C#/sdkRawSensorDataCS/obj/Debug
+/Raw Sensor Data Sample/C#/sdkRawSensorDataCS/obj/Debug

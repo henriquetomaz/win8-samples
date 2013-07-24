@@ -1,0 +1,12 @@
+﻿<vm:MainViewModel
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:DataBoundApp1.ViewModels"
+    SampleProperty="Sample Text Property Value">
+
+    <vm:MainViewModel.Items>
+        <vm:ItemViewModel ID="0" LineOne="one" LineTwo="Yup yup yup" LineThree="Uh huh, uh huh"/>
+        <vm:ItemViewModel ID="1" LineOne="two" LineTwo="One singular sensation" LineThree="Every little step she takes"/>
+    </vm:MainViewModel.Items>
+
+</vm:MainViewModel>
