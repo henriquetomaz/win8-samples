@@ -14,75 +14,9 @@ using System.Diagnostics;
 
 namespace sdkRawSensorDataCS
 {
-    using ReadingChangedHandler = TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>;
-
-    public class AccelerometerObservable
-    {
-        private readonly Accelerometer _accel;
-        private readonly IObservable<AccelerometerReading> _accelObs;
-        readonly uint _reportInterval;
-        const uint MIN_REPORT_INTERVAL = 16;
-
-        private static Lazy<AccelerometerObservable> _instanceLazy = new Lazy<AccelerometerObservable>(() => new AccelerometerObservable());
-        public static IObservable<AccelerometerReading> Instance { get { return _instanceLazy.Value._accelObs; } }
-
-        private AccelerometerObservable()
-        {
-            _accel = Accelerometer.GetDefault();            
-
-            _reportInterval = _accel.MinimumReportInterval;
-            if (_reportInterval < MIN_REPORT_INTERVAL)
-                _reportInterval = MIN_REPORT_INTERVAL;
-
-            #region + Event Subscriptions +
-            Action<ReadingChangedHandler> subscribeEvent =
-                h => {
-                    _accel.ReadingChanged += h;
-                    if (_accel.ReportInterval < _reportInterval)
-                        _accel.ReportInterval = _reportInterval;
-                };
-
-            Action<ReadingChangedHandler> unsubscribeEvent =
-                h => {
-                    _accel.ReadingChanged -= h;
-                    _accel.ReportInterval = 0;
-                };
-            #endregion 
-
-            if (_accel != null) {
-                _accelObs =
-                    Observable.FromEventPattern<ReadingChangedHandler, AccelerometerReadingChangedEventArgs>
-                    (subscribeEvent, unsubscribeEvent)
-                    //.Do(l => Debug.WriteLine("Publishing {0}", l.EventArgs.Reading.Timestamp)) //side effect to show it is running
-                    .Select(x => x.EventArgs.Reading)
-                    .Publish()
-                    .RefCount();
-            } 
-            else {
-                _accelObs = Observable.Empty<AccelerometerReading>();
-            }
-        }
-
-        void StartReading()
-        {
-            _accel.ReportInterval = _reportInterval;
-        }
-    }
-
     public partial class AccelerometerPage : PhoneApplicationPage
     {
-
-        //.Sample(TimeSpan.FromMilliseconds(200))
-        // .ObserveOnDispatcher();
-
-
-        //DispatcherTimer timer;
-        bool isDataValid;
         IDisposable _subscription;
-
-        //timer = new DispatcherTimer();
-        //timer.Interval = TimeSpan.FromMilliseconds(30);
-        //timer.Tick += new EventHandler(timer_Tick);
 
         public AccelerometerPage()
         {
@@ -116,20 +50,20 @@ namespace sdkRawSensorDataCS
 
         }
 
-        private void UpdateUI(AccelerometerReading reading)
+        private void UpdateUI(Vector3 reading)
         {
             statusTextBlock.Text = "receiving data from accelerometer.";
 
             // Show the numeric values
-            xTextBlock.Text = "X: " + reading.AccelerationX.ToString("0.00");
-            yTextBlock.Text = "Y: " + reading.AccelerationY.ToString("0.00");
-            zTextBlock.Text = "Z: " + reading.AccelerationZ.ToString("0.00");
+            xTextBlock.Text = "X: " + reading.X.ToString("0.00");
+            yTextBlock.Text = "Y: " + reading.Y.ToString("0.00");
+            zTextBlock.Text = "Z: " + reading.Z.ToString("0.00");
 
             // Show the values graphically
-            xLine.X2 = xLine.X1 + reading.AccelerationX * 100;
-            yLine.Y2 = yLine.Y1 - reading.AccelerationY * 100;
-            zLine.X2 = zLine.X1 - reading.AccelerationZ * 50;
-            zLine.Y2 = zLine.Y1 + reading.AccelerationZ * 50;            
+            xLine.X2 = xLine.X1 + reading.X * 100;
+            yLine.Y2 = yLine.Y1 - reading.Y * 100;
+            zLine.X2 = zLine.X1 - reading.Z * 50;
+            zLine.Y2 = zLine.Y1 + reading.Z * 50;            
         }
 
         // Note that this event handler is called from a background thread
