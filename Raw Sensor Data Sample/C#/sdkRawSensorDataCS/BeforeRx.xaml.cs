@@ -38,10 +38,10 @@ namespace sdkRawSensorDataCS
         private void ApplicationBarIconButton_Click(object sender, EventArgs e)
         {
             if (_accel != null)
-            {
-                                
+            {                                
                 statusTextBlock.Text = "accelerometer stopped.";
-
+                _accel.ReportInterval = 0;
+                _accel.ReadingChanged -= new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
             }
             else
             {
