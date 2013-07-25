@@ -109,6 +109,10 @@
     <Compile Include="CompassPage.xaml.cs">
       <DependentUpon>CompassPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BeforeRx.xaml.cs">
+      <DependentUpon>BeforeRx.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EmulateSensor.cs" />
     <Compile Include="GyroscopePage.xaml.cs">
       <DependentUpon>GyroscopePage.xaml</DependentUpon>
     </Compile>
@@ -129,6 +133,10 @@
     <Page Include="CompassPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BeforeRx.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="GyroscopePage.xaml">
       <SubType>Designer</SubType>

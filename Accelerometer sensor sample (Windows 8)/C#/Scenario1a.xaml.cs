@@ -1,14 +1,4 @@
-﻿//*********************************************************
-//
-// Copyright (c) Microsoft. All rights reserved.
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//*********************************************************
-
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using SDKTemplate;
@@ -20,13 +10,8 @@ using Windows.UI.Core;
 
 namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class Scenario1a : SDKTemplate.Common.LayoutAwarePage
     {
-        // A pointer back to the main page.  This is needed if you want to call methods in MainPage such
-        // as NotifyUser()
         MainPage rootPage = MainPage.Current;
 
         private Accelerometer _accelerometer;
@@ -39,8 +24,6 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             _accelerometer = Accelerometer.GetDefault();
             if (_accelerometer != null)
             {
-                // Select a report interval that is both suitable for the purposes of the app and supported by the sensor.
-                // This value will be used later to activate the sensor.
                 uint minReportInterval = _accelerometer.MinimumReportInterval;
                 _desiredReportInterval = minReportInterval > 16 ? minReportInterval : 16;
             }
@@ -50,15 +33,13 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             }
         }
 
-        /// <summary>
-        /// Invoked when this page is about to be displayed in a Frame.
-        /// </summary>
-        /// <param name="e">Event data that describes how this page was reached. The Parameter
-        /// property is typically used to configure the page.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        private void Enable()
         {
-            ScenarioEnableButton.IsEnabled = true;
-            ScenarioDisableButton.IsEnabled = false;
+            // Establish the report interval
+            _accelerometer.ReportInterval = _desiredReportInterval;
+
+            Window.Current.VisibilityChanged += new WindowVisibilityChangedEventHandler(VisibilityChanged);
+            _accelerometer.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
         }
 
         private void Disable()
@@ -70,14 +51,22 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             _accelerometer.ReportInterval = 0;
         }
 
-        /// <summary>
-        /// Invoked immediately before the Page is unloaded and is no longer the current source of a parent Frame.
-        /// </summary>
-        /// <param name="e">
-        /// Event data that can be examined by overriding code. The event data is representative
-        /// of the navigation that will unload the current Page unless canceled. The
-        /// navigation can potentially be canceled by setting Cancel.
-        /// </param>
+        async private void ReadingChanged(object sender, AccelerometerReadingChangedEventArgs e)
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                AccelerometerReading reading = e.Reading;
+                ScenarioOutput_X.Text = String.Format("{0,5:0.00}", reading.AccelerationX);
+                ScenarioOutput_Y.Text = String.Format("{0,5:0.00}", reading.AccelerationY);
+                ScenarioOutput_Z.Text = String.Format("{0,5:0.00}", reading.AccelerationZ);
+            });
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            ScenarioEnableButton.IsEnabled = true;
+            ScenarioDisableButton.IsEnabled = false;
+        }
+
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             if (ScenarioDisableButton.IsEnabled)
@@ -86,14 +75,6 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             base.OnNavigatingFrom(e);
         }
 
-        /// <summary>
-        /// This is the event handler for VisibilityChanged events. You would register for these notifications
-        /// if handling sensor data when the app is not visible could cause unintended actions in the app.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e">
-        /// Event data that can be examined for the current visibility state.
-        /// </param>
         private void VisibilityChanged(object sender, VisibilityChangedEventArgs e)
         {
             if (ScenarioEnableButton.IsEnabled)
@@ -105,36 +86,7 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             }
         }
 
-        private void Enable()
-        {
-            // Establish the report interval
-            _accelerometer.ReportInterval = _desiredReportInterval;
 
-            Window.Current.VisibilityChanged += new WindowVisibilityChangedEventHandler(VisibilityChanged);
-            _accelerometer.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);            
-        }
-
-        /// <summary>
-        /// This is the event handler for ReadingChanged events.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        async private void ReadingChanged(object sender, AccelerometerReadingChangedEventArgs e)
-        {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                AccelerometerReading reading = e.Reading;
-                ScenarioOutput_X.Text = String.Format("{0,5:0.00}", reading.AccelerationX);
-                ScenarioOutput_Y.Text = String.Format("{0,5:0.00}", reading.AccelerationY);
-                ScenarioOutput_Z.Text = String.Format("{0,5:0.00}", reading.AccelerationZ);
-            });
-        }
-
-        /// <summary>
-        /// This is the click handler for the 'Enable' button.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void ScenarioEnable(object sender, RoutedEventArgs e)
         {
             if (_accelerometer != null)
@@ -150,11 +102,6 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             }
         }
 
-        /// <summary>
-        /// This is the click handler for the 'Disable' button.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void ScenarioDisable(object sender, RoutedEventArgs e)
         {
             Disable();
