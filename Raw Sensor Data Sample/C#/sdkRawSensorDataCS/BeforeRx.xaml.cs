@@ -18,7 +18,7 @@ namespace sdkRawSensorDataCS
     public partial class BeforeRx : PhoneApplicationPage
     {
         Accelerometer _accel;
-        DispatcherTimer _timer;
+        //DispatcherTimer _timer;
 
         Vector _previousValue;
 

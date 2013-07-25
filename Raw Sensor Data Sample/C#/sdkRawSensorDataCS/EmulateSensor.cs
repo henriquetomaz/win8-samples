@@ -35,11 +35,11 @@ namespace SensorData
                 // return the vector and then sleep
                 yield return reading;
                 //Windows.System.Threading.Sleep(100);
-                Task.Delay(100).Wait();
+                Task.Delay(50).Wait();
             }
         }
 
-        public static IObservable<Vector> Emulate()
+        public static IObservable<Vector> EmulateAccelerometer()
         {
             return EmulateAccelerometerReading().ToObservable(_scheduler.Value);
         }

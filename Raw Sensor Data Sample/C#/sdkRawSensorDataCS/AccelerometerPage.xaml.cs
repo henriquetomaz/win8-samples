@@ -33,12 +33,13 @@ namespace sdkRawSensorDataCS
             }
 
             else {
-                //var source = AccelerometerObservable.Emulate();
+                //var source = EmulateSensor.EmulateAccelerometer();
                 var source = AccelerometerObservable.Instance;
 
-                _subscription = 
-                    source                   
-                    .Throttle(TimeSpan.FromMilliseconds(20))
+                _subscription =
+                    source
+                     //.FindBigMovements()                  
+                     .Sample(TimeSpan.FromMilliseconds(200))
                     .ObserveOnDispatcher()
                     .Subscribe(UpdateUI);
             }
