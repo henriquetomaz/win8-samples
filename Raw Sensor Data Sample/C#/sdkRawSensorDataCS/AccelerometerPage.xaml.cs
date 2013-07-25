@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define TEST
+
+using System;
 using Microsoft.Phone.Controls;
 
 using System.Windows.Threading;
@@ -11,6 +13,7 @@ using Windows.Foundation;
 using Windows.Devices.Sensors;
 
 using System.Diagnostics;
+using SensorData;
 
 namespace sdkRawSensorDataCS
 {
@@ -21,15 +24,6 @@ namespace sdkRawSensorDataCS
         public AccelerometerPage()
         {
             InitializeComponent();
-
-            //if (!Accelerometer.IsSupported)
-            //{
-            //    // The device on which the application is running does not support
-            //    // the accelerometer sensor. Alert the user and hide the
-            //    // application bar.
-            //    statusTextBlock.Text = "device does not support accelerometer";
-            //    ApplicationBar.IsVisible = false;
-            //}
         }
 
         private void ApplicationBarIconButton_Click(object sender, EventArgs e)
@@ -37,22 +31,29 @@ namespace sdkRawSensorDataCS
             if (_subscription != null) {
                 _subscription.Dispose();
                 _subscription = null;
-                statusTextBlock.Text = "accelerometer stopped.";
+                statusTextBlock.Text = "Accelerometer Stopped";
             }
 
             else {
+#if TEST
+                var obs = AccelerometerObservable.Emulate();
+                _subscription = 
+                    obs.ObserveOnDispatcher()
+                       .Subscribe(UpdateUI);
+#else
                 _subscription =
                     AccelerometerObservable.Instance
-                    .Sample(TimeSpan.FromMilliseconds(100))
-                    .ObserveOnDispatcher()
-                    .Subscribe(UpdateUI);
+                       .Sample(TimeSpan.FromMilliseconds(100))
+                       .ObserveOnDispatcher()
+                       .Subscribe(UpdateUI);
+#endif
             }
 
         }
 
-        private void UpdateUI(Vector3 reading)
+        private void UpdateUI(SensorData.Vector reading)
         {
-            statusTextBlock.Text = "receiving data from accelerometer.";
+            statusTextBlock.Text = "Receiving data from accelerometer...";
 
             // Show the numeric values
             xTextBlock.Text = "X: " + reading.X.ToString("0.00");
@@ -65,11 +66,6 @@ namespace sdkRawSensorDataCS
             zLine.X2 = zLine.X1 - reading.Z * 50;
             zLine.Y2 = zLine.Y1 + reading.Z * 50;            
         }
-
-        // Note that this event handler is called from a background thread
-        // and therefore does not have access to the UI thread. To update 
-        // the UI from this handler, use Dispatcher.BeginInvoke() as shown.
-        // Dispatcher.BeginInvoke(() => { statusTextBlock.Text = "in CurrentValueChanged"; });
     }
 
 #if false

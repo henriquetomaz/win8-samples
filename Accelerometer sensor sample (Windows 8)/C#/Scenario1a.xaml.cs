@@ -61,6 +61,15 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             ScenarioDisableButton.IsEnabled = false;
         }
 
+        private void Disable()
+        {
+            Window.Current.VisibilityChanged -= new WindowVisibilityChangedEventHandler(VisibilityChanged);
+            _accelerometer.ReadingChanged -= new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
+
+            // Restore the default report interval to release resources while the sensor is not in use
+            _accelerometer.ReportInterval = 0;
+        }
+
         /// <summary>
         /// Invoked immediately before the Page is unloaded and is no longer the current source of a parent Frame.
         /// </summary>
@@ -72,13 +81,7 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             if (ScenarioDisableButton.IsEnabled)
-            {
-                Window.Current.VisibilityChanged -= new WindowVisibilityChangedEventHandler(VisibilityChanged);
-                _accelerometer.ReadingChanged -= new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-
-                // Restore the default report interval to release resources while the sensor is not in use
-                _accelerometer.ReportInterval = 0;
-            }
+                Disable();
 
             base.OnNavigatingFrom(e);
         }
@@ -93,19 +96,22 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         /// </param>
         private void VisibilityChanged(object sender, VisibilityChangedEventArgs e)
         {
-            if (ScenarioDisableButton.IsEnabled)
+            if (ScenarioEnableButton.IsEnabled)
             {
                 if (e.Visible)
-                {
-                    // Re-enable sensor input (no need to restore the desired reportInterval... it is restored for us upon app resume)
-                    _accelerometer.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-                }
+                    Enable();
                 else
-                {
-                    // Disable sensor input (no need to restore the default reportInterval... resources will be released upon app suspension)
-                    _accelerometer.ReadingChanged -= new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-                }
+                    Disable();
             }
+        }
+
+        private void Enable()
+        {
+            // Establish the report interval
+            _accelerometer.ReportInterval = _desiredReportInterval;
+
+            Window.Current.VisibilityChanged += new WindowVisibilityChangedEventHandler(VisibilityChanged);
+            _accelerometer.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);            
         }
 
         /// <summary>
@@ -133,11 +139,7 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         {
             if (_accelerometer != null)
             {
-                // Establish the report interval
-                _accelerometer.ReportInterval = _desiredReportInterval;
-
-                Window.Current.VisibilityChanged += new WindowVisibilityChangedEventHandler(VisibilityChanged);
-                _accelerometer.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
+                Enable();
 
                 ScenarioEnableButton.IsEnabled = false;
                 ScenarioDisableButton.IsEnabled = true;
@@ -155,11 +157,7 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         /// <param name="e"></param>
         private void ScenarioDisable(object sender, RoutedEventArgs e)
         {
-            Window.Current.VisibilityChanged -= new WindowVisibilityChangedEventHandler(VisibilityChanged);
-            _accelerometer.ReadingChanged -= new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-
-            // Restore the default report interval to release resources while the sensor is not in use
-            _accelerometer.ReportInterval = 0;
+            Disable();
 
             ScenarioEnableButton.IsEnabled = true;
             ScenarioDisableButton.IsEnabled = false;

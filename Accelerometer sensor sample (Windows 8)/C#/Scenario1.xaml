@@ -54,6 +54,14 @@
                 <TextBlock x:Name="ScenarioOutput_Y" TextWrapping="Wrap" Grid.Row="1" Grid.Column="1" Style="{StaticResource BasicTextStyle}" HorizontalAlignment="Right" Text="No data" />
                 <TextBlock x:Name="ScenarioOutput_Z" TextWrapping="Wrap" Grid.Row="2" Grid.Column="1" Style="{StaticResource BasicTextStyle}" HorizontalAlignment="Right" Text="No data" />
             </Grid>
+            <Grid Height="300">
+                <Line x:Name="xLine" X1="240" Y1="150" X2="340" Y2="150" Stroke="Red" StrokeThickness="4"></Line>
+                <Line x:Name="yLine" X1="240" Y1="150" X2="240" Y2="50" Stroke="Green" StrokeThickness="4"></Line>
+                <Line x:Name="zLine" X1="240" Y1="150" X2="190" Y2="200" Stroke="Blue" StrokeThickness="4"></Line>
+            </Grid>
+            <Grid Margin="312,0,-312,0">
+                <Line x:Name="magLine" X1="240" Y1="150" X2="340" Y2="150" Stroke="Purple" StrokeThickness="4"></Line>
+            </Grid>            
         </Grid>
         
         <!-- Add Storyboards to the visual states below as necessary for supporting the various layouts -->

@@ -1,4 +1,6 @@
-﻿//*********************************************************
+﻿#define TEST
+
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
@@ -18,6 +20,13 @@ using Windows.Foundation;
 using System.Threading.Tasks;
 using Windows.UI.Core;
 
+using SensorData;
+
+using System.Reactive.Linq;
+using System.Reactive;
+
+
+
 namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
 {
     /// <summary>
@@ -28,26 +37,11 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         // A pointer back to the main page.  This is needed if you want to call methods in MainPage such
         // as NotifyUser()
         MainPage rootPage = MainPage.Current;
-
-        private Accelerometer _accelerometer;
-        private uint _desiredReportInterval;
+        IDisposable _subscription;
 
         public Scenario1()
         {
             this.InitializeComponent();
-
-            _accelerometer = Accelerometer.GetDefault();
-            if (_accelerometer != null)
-            {
-                // Select a report interval that is both suitable for the purposes of the app and supported by the sensor.
-                // This value will be used later to activate the sensor.
-                uint minReportInterval = _accelerometer.MinimumReportInterval;
-                _desiredReportInterval = minReportInterval > 16 ? minReportInterval : 16;
-            }
-            else
-            {
-                rootPage.NotifyUser("No accelerometer found", NotifyType.StatusMessage);
-            }
         }
 
         /// <summary>
@@ -61,6 +55,17 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             ScenarioDisableButton.IsEnabled = false;
         }
 
+        private void Disable()
+        {
+            Window.Current.VisibilityChanged -= new WindowVisibilityChangedEventHandler(VisibilityChanged);
+
+            if (_subscription != null) {
+                _subscription.Dispose();
+                _subscription = null;
+                //statusTextBlock.Text = "Accelerometer Stopped";
+            }
+        }
+
         /// <summary>
         /// Invoked immediately before the Page is unloaded and is no longer the current source of a parent Frame.
         /// </summary>
@@ -72,13 +77,7 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             if (ScenarioDisableButton.IsEnabled)
-            {
-                Window.Current.VisibilityChanged -= new WindowVisibilityChangedEventHandler(VisibilityChanged);
-                _accelerometer.ReadingChanged -= new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-
-                // Restore the default report interval to release resources while the sensor is not in use
-                _accelerometer.ReportInterval = 0;
-            }
+                Disable();
 
             base.OnNavigatingFrom(e);
         }
@@ -93,18 +92,11 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         /// </param>
         private void VisibilityChanged(object sender, VisibilityChangedEventArgs e)
         {
-            if (ScenarioDisableButton.IsEnabled)
-            {
+            if (ScenarioEnableButton.IsEnabled) {
                 if (e.Visible)
-                {
-                    // Re-enable sensor input (no need to restore the desired reportInterval... it is restored for us upon app resume)
-                    _accelerometer.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-                }
+                    Enable();
                 else
-                {
-                    // Disable sensor input (no need to restore the default reportInterval... resources will be released upon app suspension)
-                    _accelerometer.ReadingChanged -= new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-                }
+                    Disable();
             }
         }
 
@@ -124,6 +116,44 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             });
         }
 
+        private void UpdateUI(SensorData.Vector reading)
+        {
+            ScenarioOutput_X.Text = String.Format("{0,5:0.00}", reading.X);
+            ScenarioOutput_Y.Text = String.Format("{0,5:0.00}", reading.Y);
+            ScenarioOutput_Z.Text = String.Format("{0,5:0.00}", reading.Z);
+
+            // Show the values graphically
+            xLine.X2 = xLine.X1 + reading.X * 100;
+            yLine.Y2 = yLine.Y1 - reading.Y * 100;
+            zLine.X2 = zLine.X1 - reading.Z * 50;
+            zLine.Y2 = zLine.Y1 + reading.Z * 50;  
+        }
+
+        private void Enable()
+        {
+            Window.Current.VisibilityChanged += new WindowVisibilityChangedEventHandler(VisibilityChanged);
+
+#if TEST
+            var obs = AccelerometerObservable.Emulate();
+            _subscription =
+                obs.ObserveOnDispatcher()
+                    .Subscribe(UpdateUI);
+
+            AccelerometerObservable.FindBigMovements(obs).Subscribe(Update2);
+#else
+            _subscription =
+                AccelerometerObservable.Instance
+                    .Sample(TimeSpan.FromMilliseconds(100))
+                    .ObserveOnDispatcher()
+                    .Subscribe(UpdateUI);
+#endif
+         }
+
+        private void Update2(Vector v)
+        {
+            magLine.X2 = magLine.X1 + v.Length() * 100;
+        }
+
         /// <summary>
         /// This is the click handler for the 'Enable' button.
         /// </summary>
@@ -131,21 +161,10 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         /// <param name="e"></param>
         private void ScenarioEnable(object sender, RoutedEventArgs e)
         {
-            if (_accelerometer != null)
-            {
-                // Establish the report interval
-                _accelerometer.ReportInterval = _desiredReportInterval;
+            Enable();
 
-                Window.Current.VisibilityChanged += new WindowVisibilityChangedEventHandler(VisibilityChanged);
-                _accelerometer.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-
-                ScenarioEnableButton.IsEnabled = false;
-                ScenarioDisableButton.IsEnabled = true;
-            }
-            else
-            {
-                rootPage.NotifyUser("No accelerometer found", NotifyType.StatusMessage);
-            }
+            ScenarioEnableButton.IsEnabled = false;
+            ScenarioDisableButton.IsEnabled = true;
         }
 
         /// <summary>
@@ -155,11 +174,7 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         /// <param name="e"></param>
         private void ScenarioDisable(object sender, RoutedEventArgs e)
         {
-            Window.Current.VisibilityChanged -= new WindowVisibilityChangedEventHandler(VisibilityChanged);
-            _accelerometer.ReadingChanged -= new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-
-            // Restore the default report interval to release resources while the sensor is not in use
-            _accelerometer.ReportInterval = 0;
+            Disable();
 
             ScenarioEnableButton.IsEnabled = true;
             ScenarioDisableButton.IsEnabled = false;
