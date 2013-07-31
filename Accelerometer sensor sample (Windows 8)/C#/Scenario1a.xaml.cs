@@ -38,8 +38,8 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
             // Establish the report interval
             _accelerometer.ReportInterval = _desiredReportInterval;
 
-            Window.Current.VisibilityChanged += new WindowVisibilityChangedEventHandler(VisibilityChanged);
-            _accelerometer.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
+            Window.Current.VisibilityChanged += VisibilityChanged;
+            _accelerometer.ReadingChanged += ReadingChanged;
         }
 
         private void Disable()

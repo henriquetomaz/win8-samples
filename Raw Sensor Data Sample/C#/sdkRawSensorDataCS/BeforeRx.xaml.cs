@@ -48,7 +48,6 @@ namespace sdkRawSensorDataCS
                 _accel.ReportInterval = 16;
                 _accel.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
             }
-
         }
 
         private void ReadingChanged(Accelerometer sender, AccelerometerReadingChangedEventArgs args)
