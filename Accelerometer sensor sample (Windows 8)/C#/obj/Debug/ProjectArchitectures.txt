@@ -1,1 +1,0 @@
-D:\tfs-online-repos\Samples\Accelerometer sensor sample (Windows 8)\C#\AccelerometerCS.csproj;neutral

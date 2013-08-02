@@ -1,4 +1,4 @@
-﻿################################################################################
+################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
@@ -10,3 +10,9 @@
 /Accelerometer sensor sample (Windows 8)/C#/packages/Rx-Core.2.1.30214.0
 /Search contract sample (Windows 8)/C#/bin/Debug
 /Search contract sample (Windows 8)/C#/obj/Debug
+Accelerometer sensor sample (Windows 8)/C#/packages/
+DataBoundApp1/DataBoundApp1/Bin/
+DataBoundApp1/DataBoundApp1/obj/
+Search contract sample (Windows 8)/C#/packages/
+DataBoundApp1/packages/
+Raw Sensor Data Sample/C#/packages/
