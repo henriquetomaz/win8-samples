@@ -5,5 +5,7 @@
 /Accelerometer sensor sample (Windows 8)/C#/obj/Debug
 /Search contract sample (Windows 8)/C#/bin/Debug
 /Search contract sample (Windows 8)/C#/obj/Debug
-DataBoundApp1/DataBoundApp1/Bin/
-DataBoundApp1/DataBoundApp1/obj/
+/DataBoundApp1/DataBoundApp1/Bin/
+/DataBoundApp1/DataBoundApp1/obj/
+/HubApp1/HubApp1/bin
+/HubApp1/HubApp1/obj

@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Machine>DONNAM8</Machine>
+    <WindowsUser>donnam</WindowsUser>
+    <SolutionConfiguration>Debug|AnyCPU</SolutionConfiguration>
+    <PackageArchitecture>neutral</PackageArchitecture>
+    <RegisteredManifestChecksum>D61751B6EA7C9669D05A16AEDF761DF60C44E1A8AA86B0E2D8A7E5BA29B2BA1E</RegisteredManifestChecksum>
+    <RegisteredPackageMoniker>f0c3efc1-1dda-4d38-bb6e-2943e2d21f22_1.0.0.0_neutral__sb8vjp0fdd6q8</RegisteredPackageMoniker>
+    <RegisteredUserModeAppID>f0c3efc1-1dda-4d38-bb6e-2943e2d21f22_sb8vjp0fdd6q8!App</RegisteredUserModeAppID>
+    <RegisteredPackageID>f0c3efc1-1dda-4d38-bb6e-2943e2d21f22</RegisteredPackageID>
+    <RegisteredPackagePublisher>CN=donnam</RegisteredPackagePublisher>
+    <RegisteredVersion>1.0.0.0</RegisteredVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppXManifest Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\bin\Debug\AppxManifest.xml">
+      <PackagePath>AppxManifest.xml</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-08-09T23:25:05.389</Modified>
+    </AppXManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\bin\Debug\HubApp1.exe">
+      <PackagePath>HubApp1.exe</PackagePath>
+      <Modified>2013-08-09T23:25:05.079</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\bin\Debug\HubApp1.pdb">
+      <PackagePath>HubApp1.pdb</PackagePath>
+      <Modified>2013-08-09T23:25:05.028</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\DataModel\SampleData.json">
+      <PackagePath>DataModel\SampleData.json</PackagePath>
+      <Modified>2013-08-09T23:08:30.485</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\Assets\Logo.scale-100.png">
+      <PackagePath>Assets\Logo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-04-19T02:13:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\Assets\SmallLogo.scale-100.png">
+      <PackagePath>Assets\SmallLogo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-04-19T02:13:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\Assets\SplashScreen.scale-100.png">
+      <PackagePath>Assets\SplashScreen.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-04-19T02:13:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\Assets\StoreLogo.scale-100.png">
+      <PackagePath>Assets\StoreLogo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-04-19T02:13:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\Assets\LightGray.png">
+      <PackagePath>Assets\LightGray.png</PackagePath>
+      <Modified>2013-04-19T02:13:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\Assets\MediumGray.png">
+      <PackagePath>Assets\MediumGray.png</PackagePath>
+      <Modified>2013-04-19T02:13:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\Assets\DarkGray.png">
+      <PackagePath>Assets\DarkGray.png</PackagePath>
+      <Modified>2013-04-19T02:13:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\bin\Debug\App.xbf">
+      <PackagePath>App.xbf</PackagePath>
+      <Modified>2013-08-09T23:25:04.780</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\bin\Debug\HubPage.xbf">
+      <PackagePath>HubPage.xbf</PackagePath>
+      <Modified>2013-08-09T23:25:04.782</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\bin\Debug\SectionPage.xbf">
+      <PackagePath>SectionPage.xbf</PackagePath>
+      <Modified>2013-08-09T23:25:04.784</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\bin\Debug\ItemPage.xbf">
+      <PackagePath>ItemPage.xbf</PackagePath>
+      <Modified>2013-08-09T23:25:04.786</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="c:\users\donnam\documents\visual studio 2013\Projects\HubApp1\HubApp1\bin\Debug\resources.pri">
+      <PackagePath>resources.pri</PackagePath>
+      <Modified>2013-08-09T23:25:05.178</Modified>
+    </AppxPackagedFile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>
