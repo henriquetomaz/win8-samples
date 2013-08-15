@@ -23,104 +23,106 @@ namespace SearchContract
 {
     public sealed partial class RxOpenSearch : SDKTemplate.Common.LayoutAwarePage, IDisposable
     {
-        private SearchPane searchPane;
-        private HttpClient httpClient;
-        private Random rand = new Random(100);
+        private SearchPane _searchPane;
+        private HttpClient _httpClient;
+        private Random _rand = new Random(100);
+
+        private IDisposable _subscription; // for subscribing/unsubscribing to search contract events
 
         public RxOpenSearch()
         {
             this.InitializeComponent();
-            searchPane = SearchPane.GetForCurrentView();
-            httpClient = new HttpClient();
-        }
-
-        ~RxOpenSearch()
-        {
-            Dispose();
+            _searchPane = SearchPane.GetForCurrentView();
+            _httpClient = new HttpClient();
         }
 
         public void Dispose()
         {
-            if (httpClient != null)
-                httpClient.Dispose();
+            if (_httpClient != null)
+                _httpClient.Dispose();
         }
 
-        /// <summary>
-        ///  Searches Wikipedia for the given query string, return as a json array
-        /// </summary>
-        private async Task<JsonArray> SearchWikipedia(string queryStr)
+        private async Task<JsonArray> SearchWikipediaAsync(string queryStr)
         {
             var url = 
                 "http://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=" 
                 + Uri.EscapeDataString(queryStr);
 
-            string result = await httpClient.GetStringAsync(url);
-            await Task.Delay(rand.Next(50, 6000));
+            string result = await _httpClient.GetStringAsync(url);
+            //await Task.Delay(rand.Next(50, 1000));
 
             return JsonArray.Parse(result);
-
-                    //.ToObservable()
-                    //.Select<string, JsonArray>(
-                    //    result => {
-                    //        // inject a delay to simulate the time for the web response
-                    //        return JsonArray.Parse(result);
-                    //    });
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        private IDisposable SubscribeWikipediaSuggest()
         {
-            MainPage.Current.NotifyUser("Use the search pane to submit a query", NotifyType.StatusMessage);
+            var searchPaneSuggestRequested = // type is IObservable<SearchPaneSuggestionsRequestedEventArgs>
+                Observable.FromEventPattern<SearchPaneSuggestionsRequestedEventArgs>(
+                    _searchPane, "SuggestionsRequested")
+                .Where(ev => ev.EventArgs.QueryText.Length > 2)    // only if the text is longer than 2 characters
+                .Select(ev => new {
+                    ev.EventArgs.QueryText,
+                    Deferral = ev.EventArgs.Request.GetDeferral(),
+                    ev.EventArgs.Request.SearchSuggestionCollection
+                })
+                .Throttle(TimeSpan.FromMilliseconds(750))    // wait until user pauses for 750ms
+                .DistinctUntilChanged(ev => ev.QueryText);   // only if the value has changed
 
-            // IObservable<SearchPaneSuggestionsRequestedEventArgs>
-            var userSearch =
-                WindowsObservable
-                    .FromEventPattern<SearchPane, SearchPaneSuggestionsRequestedEventArgs>
-                        (h => searchPane.SuggestionsRequested += h,  // lambda for attaching an event handler
-                         h => searchPane.SuggestionsRequested -= h)  // lambda for removing event handler
-                    .Select(ev => ev.EventArgs) // select the Event argument (don't need the sender)
-                    .Where(args => args.QueryText.Length > 2)    // only if the text is longer than 2 characters
-                    .Throttle(TimeSpan.FromMilliseconds(750))    // wait until user pauses for 750ms
-                    .DistinctUntilChanged();                     // only if the value has changed
 
-            userSearch.Select(
-                item => 
-                    SearchWikipedia(item.QueryText).ContinueWith(result => new { req = item.Request, result })
-                )
-                .Switch()
-                .Subcribe(
-                    data => addToSearchResults(data.result, data.req.SearchSuggestionCollection, MainPage.SearchPaneMaxSuggestions)
+            var queried =
+                searchPaneSuggestRequested
+                .Select(
+                    item => 
+                        SearchWikipediaAsync(item.QueryText)
+                        .ToObservable()
+                        .Select(results => new {
+                            Results = results,
+                            item.Deferral, 
+                            item.SearchSuggestionCollection
+                        })
                     )
-            );
+                    .Switch()
+                    .ObserveOnDispatcher();
 
 
-            userSearch.Subscribe(
-                async item => {
-                    var array = await SearchWikipedia(item.QueryText);
-                    addToSearchResults(array, item.Request.SearchSuggestionCollection, MainPage.SearchPaneMaxSuggestions);
-                });
-
-            //userSearch.Select(next => SearchWikipedia(next.QueryText))
-            //    .Switch()
-            //    .Subscribe(printJsonArray);
-
-                // ,
-                // to do: add OnError handler and OnCompleted
-                //error => 
-
-#if false
-            JsonArray parsedResponse = JsonArray.Parse(response);
-            }
-#endif
-
+            return queried.Subscribe(
+                    data => { 
+                        addToSearchResults(data.Results, data.SearchSuggestionCollection, MainPage.SearchPaneMaxSuggestions);
+                        data.Deferral.Complete();
+                    });
         }
 
-        private void printJsonArray(JsonArray jsonArray)
+        private void DoWikipediaSearch(SearchPaneSuggestionsRequestedEventArgs request)
         {
-            if (jsonArray.Count > 1) {
-                foreach (JsonValue value in jsonArray[1].GetArray()) {
-                    Debug.WriteLine(value.GetString());
-                }
-            }
+            MainPage.Current.NotifyUser("Searching for: " + request.QueryText, NotifyType.StatusMessage);
+
+            var deferral = request.Request.GetDeferral();
+
+            request.Request.SearchSuggestionCollection.AppendQuerySuggestion("FOoo");
+
+            //var resultArray = await SearchWikipediaAsync(request.QueryText);
+
+            //addToSearchResults(
+            //    resultArray, 
+            //    request.Request.SearchSuggestionCollection, 
+            //    MainPage.SearchPaneMaxSuggestions);
+            deferral.Complete();
+        }
+
+        private IDisposable ImperativeSubscribe()
+        {
+            var searchPaneSuggestRequested = // type is IObservable<SearchPaneSuggestionsRequestedEventArgs>
+                Observable.FromEventPattern<SearchPaneSuggestionsRequestedEventArgs>(
+                    _searchPane, "SuggestionsRequested")
+                .Where(ev => ev.EventArgs.QueryText.Length > 2)    // only if the text is longer than 2 characters
+                .Select(ev => ev.EventArgs)
+                // need to get deferral
+                .Throttle(TimeSpan.FromMilliseconds(750))    // wait until user pauses for 750ms
+                .DistinctUntilChanged(ev => ev.QueryText);   // only if the value has changed
+
+            return searchPaneSuggestRequested
+                .ObserveOn(Dispatcher)
+                .Subscribe(DoWikipediaSearch);
         }
 
         private void addToSearchResults(JsonArray jsonArray, SearchSuggestionCollection suggestionResult, int maxResults)
@@ -128,6 +130,7 @@ namespace SearchContract
             if (jsonArray.Count > 1) {
                 foreach (JsonValue value in jsonArray[1].GetArray()) {
                     suggestionResult.AppendQuerySuggestion(value.GetString());
+                    Debug.WriteLine("Suggestion: " + value.GetString());
                     if (suggestionResult.Size >= MainPage.SearchPaneMaxSuggestions) {
                         break;
                     }
@@ -135,8 +138,19 @@ namespace SearchContract
             }
         }
 
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            MainPage.Current.NotifyUser("Use the search pane to submit a query", NotifyType.StatusMessage);
+
+            Debug.Assert(_subscription == null);
+            //_subscription = SubscribeWikipediaSuggest();
+            _subscription = ImperativeSubscribe();
+        }
+
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
+            _subscription.Dispose();
+            _subscription = null;
         }
     }
 }

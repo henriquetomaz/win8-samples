@@ -26,8 +26,10 @@ namespace SDKTemplate
             //new Scenario() { Title = "Suggestions provided by Windows",          ClassType = typeof(SearchContract.Scenario4) },
             new Scenario() { Title = "Suggestions from Open Search",             ClassType = typeof(SearchContract.OpenSearch) },
             new Scenario() { Title = "Suggestions from a service returning XML", ClassType = typeof(SearchContract.XMLSearch) },
+
             new Scenario() { Title = "(Rx) Suggestions from Open Search",             ClassType = typeof(SearchContract.RxOpenSearch) },
             new Scenario() { Title = "(Rx) Suggestions from a service returning XML", ClassType = typeof(SearchContract.RxXMLSearch) },
+
             //new Scenario() { Title = "Open Search charm by typing",              ClassType = typeof(SearchContract.Scenario7) },
         };
 

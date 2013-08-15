@@ -53,7 +53,7 @@ namespace SearchContract
 
         private void OnSearchPaneSuggestionsRequested(SearchPane sender, SearchPaneSuggestionsRequestedEventArgs e)
         {
-            Task.Delay(5000).Wait();
+            //Task.Delay(5000).Wait();
 
             var queryText = e.QueryText;
             if (string.IsNullOrEmpty(queryText))
