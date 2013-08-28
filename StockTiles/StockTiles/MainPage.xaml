@@ -1,13 +1,42 @@
 ﻿<Page
-    x:Class="StockTiles.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:StockTiles"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Class="StockTiles.MainPage"
     mc:Ignorable="d">
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="245" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="155" />
+            <RowDefinition Height="155" />
+            <RowDefinition Height="155" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Column="0" Name="liveTile1" HorizontalAlignment="Right" Height="145" VerticalAlignment="Top" Width="246" Grid.RowSpan="2" Background="#FF00AED3" Grid.ColumnSpan="2" Margin="0,145,10,0">
+            <StackPanel Margin="5">
+                <TextBlock Foreground="Black" Text="{Binding Name}" FontSize="20" />
+                <TextBlock Foreground="White" Text="{Binding Price}" FontSize="20" />
+                <TextBlock Foreground="White" Text="{Binding TrendTick}" FontSize="20" />
+                <TextBlock Foreground="White" Text="{Binding MovingAvg30Sec}" FontSize="20" />
+                <TextBlock Foreground="White" Text="{Binding MovingAvg1Min}" FontSize="20" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Column="1" Name="liveTile2" HorizontalAlignment="Right" Height="145" VerticalAlignment="Top" Width="246" Grid.RowSpan="2" Background="#FF00AED3" Margin="0,145,-269,0">
+            <StackPanel Margin="5">
+                <TextBlock Foreground="Black" Text="{Binding Name}" FontSize="20" />
+                <TextBlock Foreground="White" Text="{Binding Price}" FontSize="20" />
+                <TextBlock Foreground="White" Text="{Binding TrendTick}" FontSize="20" />
+                <TextBlock Foreground="White" Text="{Binding MovingAvg30Sec}" FontSize="20" />
+                <TextBlock Foreground="White" Text="{Binding MovingAvg1Min}" FontSize="20" />
+           </StackPanel>
+        </Grid>
     </Grid>
 </Page>

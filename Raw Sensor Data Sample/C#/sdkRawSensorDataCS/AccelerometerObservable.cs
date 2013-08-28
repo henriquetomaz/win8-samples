@@ -19,7 +19,7 @@ namespace SensorData
     {
         public static IObservable<Vector> FindBigMovements(this IObservable<Vector> source)
         {
-            // Use the Scan method to take compare each element to the previous one
+            // Use the Scan method to compare each element to the previous one
             var deltas =
                 source.Scan(
                     new { last = new Vector(), delta = new Vector() },
