@@ -20,18 +20,14 @@ using System.Reactive;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace StockTiles
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
         const string TREND_UP = "▲";
+        const string TREND_UP_SMALL = "▴";
         const string TREND_DOWN = "▼";
+        const string TREND_DOWN_SMALL = "▾";
         const string TREND_NEUTRAL = "-";
 
         public MainPage()
@@ -78,9 +74,8 @@ namespace StockTiles
                 Price = 500.0,
             };
 
-            liveTile1.DataContext = data1;
-            liveTile2.DataContext = data2;
-
+            var dataList = new[] { data1, data2 };
+            itemGridView.ItemsSource = dataList;
 
             var obs1 = GetSimulatedTicker(34, 0.05).Publish().RefCount();
             var obs2 = GetSimulatedTicker(500, 0.01).Publish().RefCount();

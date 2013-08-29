@@ -7,36 +7,38 @@
     x:Class="StockTiles.MainPage"
     mc:Ignorable="d">
 
-    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220" />
-            <ColumnDefinition Width="245" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="155" />
-            <RowDefinition Height="155" />
-            <RowDefinition Height="155" />
-        </Grid.RowDefinitions>
-
-        <Grid Grid.Column="0" Name="liveTile1" HorizontalAlignment="Right" Height="145" VerticalAlignment="Top" Width="246" Grid.RowSpan="2" Background="#FF00AED3" Grid.ColumnSpan="2" Margin="0,145,10,0">
-            <StackPanel Margin="5">
-                <TextBlock Foreground="Black" Text="{Binding Name}" FontSize="20" />
-                <TextBlock Foreground="White" Text="{Binding Price}" FontSize="20" />
-                <TextBlock Foreground="White" Text="{Binding TrendTick}" FontSize="20" />
-                <TextBlock Foreground="White" Text="{Binding MovingAvg30Sec}" FontSize="20" />
-                <TextBlock Foreground="White" Text="{Binding MovingAvg1Min}" FontSize="20" />
-            </StackPanel>
+    <!-- Horizontal scrolling grid -->
+  <GridView
+            x:Name="itemGridView"
+            AutomationProperties.AutomationId="ItemGridView"
+            AutomationProperties.Name="Items In Group"
+            TabIndex="1"
+            Grid.RowSpan="2"
+            Padding="105,126,120,50"
+            SelectionMode="None"
+            IsSwipeEnabled="false"
+            Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+            IsItemClickEnabled="True">
+    <GridView.ItemTemplate>
+      <DataTemplate>
+        <Grid Grid.Column="0" HorizontalAlignment="Right" Height="145" VerticalAlignment="Top" Width="246" Grid.RowSpan="2" Background="#FF00AED3" Grid.ColumnSpan="2" Margin="0,145,10,0">
+          <StackPanel Margin="5">
+            <TextBlock Foreground="Black" Text="{Binding Name}" FontSize="20" />
+            <TextBlock Foreground="White" Text="{Binding Price}" FontSize="20" />
+            <TextBlock Foreground="White" Text="{Binding TrendTick}" FontSize="20" />
+            <TextBlock Foreground="White" Text="{Binding MovingAvg30Sec}" FontSize="20" />
+            <TextBlock Foreground="White" Text="{Binding MovingAvg1Min}" FontSize="20" />
+          </StackPanel>
         </Grid>
+      </DataTemplate>
+    </GridView.ItemTemplate>
 
-        <Grid Grid.Column="1" Name="liveTile2" HorizontalAlignment="Right" Height="145" VerticalAlignment="Top" Width="246" Grid.RowSpan="2" Background="#FF00AED3" Margin="0,145,-269,0">
-            <StackPanel Margin="5">
-                <TextBlock Foreground="Black" Text="{Binding Name}" FontSize="20" />
-                <TextBlock Foreground="White" Text="{Binding Price}" FontSize="20" />
-                <TextBlock Foreground="White" Text="{Binding TrendTick}" FontSize="20" />
-                <TextBlock Foreground="White" Text="{Binding MovingAvg30Sec}" FontSize="20" />
-                <TextBlock Foreground="White" Text="{Binding MovingAvg1Min}" FontSize="20" />
-           </StackPanel>
-        </Grid>
-    </Grid>
+    <GridView.ItemContainerStyle>
+      <Style TargetType="FrameworkElement">
+        <Setter Property="Margin" Value="0,0,0,2"/>
+      </Style>
+    </GridView.ItemContainerStyle>
+
+  </GridView>
+
 </Page>
