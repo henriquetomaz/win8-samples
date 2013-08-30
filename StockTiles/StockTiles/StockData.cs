@@ -11,9 +11,12 @@ namespace StockTiles
     public class StockData : INotifyPropertyChanged
     {
         private double _price;
-        private string _trendTick;
+        private string _openDelta;
+        private string _tickDelta;
         private string _trend30Sec;
         private string _trend1Min;
+        private string _upDownIcon;
+        private string _priceString;
 
         public double OpenPrice { get; set; }
 
@@ -26,12 +29,40 @@ namespace StockTiles
                 SetProperty(ref _price, value);
             }
         }
-        public string TrendTick
+
+        // hack to get around the fact that WinRT XAML doesn't have a string formatting specifier for data binding
+        public string PriceString
         {
-            get { return _trendTick; }
+            get { return _priceString; }
             set
             {
-                SetProperty(ref _trendTick, value);
+                SetProperty(ref _priceString, value);
+            }
+        }
+
+        public string UpDownIcon
+        {
+            get { return _upDownIcon; }
+            set
+            {
+                SetProperty(ref _upDownIcon, value);
+            }
+        }
+
+        public string OpenDelta
+        {
+            get { return _openDelta; }
+            set
+            {
+                SetProperty(ref _openDelta, value);
+            }
+        }
+        public string TickDelta
+        {
+            get { return _tickDelta; }
+            set
+            {
+                SetProperty(ref _tickDelta, value);
             }
         }
 
@@ -60,6 +91,35 @@ namespace StockTiles
                 var handler = PropertyChanged;
                 if (handler != null)
                 {
+                    handler(this, new PropertyChangedEventArgs(name));
+                }
+            }
+        }
+
+        public double variance;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
+
+    public class CombinedData : INotifyPropertyChanged 
+    {
+        private string _combinedChange;
+
+        public string CombinedChange
+        {
+            get { return _combinedChange; }
+            set
+            {
+                SetProperty(ref _combinedChange, value);
+            }
+        }
+
+        private void SetProperty<T>(ref T field, T value, [CallerMemberName] string name = "")
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, value)) {
+                field = value;
+                var handler = PropertyChanged;
+                if (handler != null) {
                     handler(this, new PropertyChangedEventArgs(name));
                 }
             }
