@@ -25,24 +25,17 @@ namespace StockTiles
     public sealed partial class MainPage : Page
     {
         const string TREND_UP = "▲";
-        const string TREND_UP_SMALL = "▴";
         const string TREND_DOWN = "▼";
-        const string TREND_DOWN_SMALL = "▾";
-        const string TREND_NEUTRAL = "-";
 
         public MainPage()
         {
             this.InitializeComponent();
         }
 
-        private void UpdateValue(StockData stock, double newValue)
-        {
-
-        }
 
         // MSFT 
-        // 34 (^ 0.1  5%  since open)
-        // ^ 0.1 (last tick)
+        // ^34 (+ 0.1  +5%  since open)
+        // 0.1 (last tick)
         //
         // moving averages
         // 33  (30 second)
@@ -54,31 +47,15 @@ namespace StockTiles
 
         private static string FormatDelta(double oldPrice, double newPrice, bool showPercent = false)
         {
-            var delta = newPrice - oldPrice;
+            var delta = Math.Round(newPrice - oldPrice, 2);
+            string percentString = showPercent ? String.Format("({0:+0.0%;-0.0%})", delta / oldPrice) : "";
 
-            Debug.WriteLine("new price: {0},    delta: {1}", newPrice, delta);
-
-            #region Triangle display
-            string triangle;
-            if (showPercent)
-                triangle = delta < 0 ? TREND_DOWN : TREND_UP;
-            else
-                triangle = delta < 0 ? TREND_DOWN_SMALL : TREND_UP_SMALL;
-            #endregion
-
-            string percentString = showPercent ? String.Format("{0:0.0%}", delta / oldPrice) : "";
-
-            return String.Format("{0}   {1:0.00}   {2:0.0%}", triangle, Math.Abs(delta), percentString);
+            return String.Format("{0:+0.00;-0.00}   {1}", delta, percentString);
         }
 
-        private string FormatMovingAvg(StockData stock, double newValue)
+        private static string FormatUpDownIcon(double delta)
         {
-            Debug.WriteLine("new moving average: {0}", newValue);
-
-            //double percentChange = Math.Round(delta / stock.Price * 100, 1);
-            double delta = newValue - stock.OpenPrice;
-            var icon = delta < 0 ? TREND_DOWN : TREND_UP;
-            return String.Format("{0}   {1:0.00}  ({2:0.0%})  ", icon, delta, newValue);
+            return delta < 0 ? TREND_DOWN : TREND_UP;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -112,8 +89,10 @@ namespace StockTiles
                 .Subscribe(
                     x => {
                         stock.OpenDelta = FormatDelta(stock.OpenPrice, x, showPercent: true);
+                        stock.UpDownIcon = FormatUpDownIcon(x - stock.Price);
                         stock.TickDelta = FormatDelta(stock.Price, x);
                         stock.Price = x;
+                        stock.PriceString = String.Format("{0:0.00}", x);
                     }
                 );
 
@@ -145,8 +124,10 @@ namespace StockTiles
                         var nextRand = random.NextDouble();
                         var newVal = 0.0;
 
-                        if (nextRand > .90)
+                        if (nextRand > .95)
                             newVal = variance * 10;
+                        else if (nextRand > .90)
+                            newVal = -variance * 10;
                         else if (nextRand > .50)
                             newVal = variance * nextRand;
                         else

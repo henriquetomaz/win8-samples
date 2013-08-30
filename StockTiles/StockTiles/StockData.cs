@@ -15,6 +15,8 @@ namespace StockTiles
         private string _tickDelta;
         private string _trend30Sec;
         private string _trend1Min;
+        private string _upDownIcon;
+        private string _priceString;
 
         public double OpenPrice { get; set; }
 
@@ -25,6 +27,25 @@ namespace StockTiles
             set
             {
                 SetProperty(ref _price, value);
+            }
+        }
+
+        // hack to get around the fact that WinRT XAML doesn't have a string formatting specifier for data binding
+        public string PriceString
+        {
+            get { return _priceString; }
+            set
+            {
+                SetProperty(ref _priceString, value);
+            }
+        }
+
+        public string UpDownIcon
+        {
+            get { return _upDownIcon; }
+            set
+            {
+                SetProperty(ref _upDownIcon, value);
             }
         }
 
