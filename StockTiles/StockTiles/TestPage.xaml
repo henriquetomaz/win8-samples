@@ -7,54 +7,79 @@
     x:Class="StockTiles.TestPage"
     mc:Ignorable="d">
 
-  <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+  <Grid>
+    <Grid.Background>
+      <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="Black" Offset="0"/>
+        <GradientStop Color="White" Offset="0.797"/>
+      </LinearGradientBrush>
+    </Grid.Background>
 
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="300" />
-      <ColumnDefinition Width="245" />
-      <ColumnDefinition Width="245" />
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
     </Grid.ColumnDefinitions>
 
     <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
 
     <Grid Grid.Column="0" Name="liveTile1" HorizontalAlignment="Right" >
-      <Grid Background="#FF00AED3" Width="200">
+      <Grid Width="300" Background="#C900AED3" Margin="40">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="75" />
+          <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        
+
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+          <TextBlock Grid.Column="0" Foreground="#FF393939" Text="▲" FontSize="16" VerticalAlignment="Bottom" Margin="10,0,6,6"/>
+          <TextBlock Grid.Column="1" Foreground="#FF393939" Text="32.10" FontSize="36" VerticalAlignment="Bottom"/>
+          <TextBlock Grid.Column="2" Foreground="#FFECCFA3" Text="+.20  (+5%)" FontSize="18" FontWeight="SemiBold" Margin="10" TextAlignment="Left" VerticalAlignment="Bottom"/>
+        </Grid>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Foreground="#FFF8A429" 
+                   Text="MSFT" 
+                   FontSize="24" Margin="10" FontFamily="Segoe UI Black" FontWeight="Bold" />
+              
+        <TextBlock Grid.Row="2" Grid.Column="0" Foreground="Black" 
+                   Text="+ .1" FontSize="20" Margin="10" VerticalAlignment="Center" />
         
-        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Foreground="Black" Text="MSFT" FontSize="20" Margin="10, 10, 10, 20" FontWeight="Bold" />
-        <TextBlock Grid.Row="1" Grid.Column="0" Foreground="White" Text="30" FontSize="20" Margin="10" FontWeight="Bold"/>
-        <TextBlock Grid.Row="1" Grid.Column="1" Foreground="White" Text="^ .20 (5%)" FontSize="20" Margin="10" TextAlignment="Right"/>
-        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Foreground="White" Text="Moving Averages" FontSize="20" Margin="10, 20, 0, 0"/>
-        <TextBlock Grid.Row="3" Grid.Column="0" Foreground="White" Text="35" FontSize="20" Margin="10"/>
-        <TextBlock Grid.Row="3" Grid.Column="1" Foreground="White" Text="(30 Second)" FontSize="20" Margin="10" TextAlignment="Right"/>
-        <TextBlock Grid.Row="4" Grid.Column="0" Foreground="White" Text="37" FontSize="20" Margin="10" />
-        <TextBlock Grid.Row="4" Grid.Column="1" Foreground="White" Text="(60 Second)" FontSize="20" Margin="10" TextAlignment="Right"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" 
+                   Text="last tick" FontSize="14" Margin="10,0,10,9" TextAlignment="Left" VerticalAlignment="Bottom" Foreground="#FF474747" FontStyle="Italic"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" 
+                   Text="Moving Averages" FontSize="14" Margin="10, 20, 0, 0" VerticalAlignment="Center" Foreground="#FFFFE7C7" FontWeight="SemiLight"/>
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Foreground="#FF474747" 
+                   Text="35.10" FontSize="22" FontWeight="SemiBold" Margin="10"/>
+        <TextBlock Grid.Row="5" Grid.Column="0" Foreground="#FF474747" 
+                   Text="37.11" FontSize="22" FontWeight="SemiBold" Margin="10"/>
+
+        <TextBlock Grid.Row="4" Grid.Column="1" FontSize="12" Margin="10,12" TextAlignment="Left" VerticalAlignment="Center" Foreground="#FF474747"
+                   Text="30 Second" />
+
+        <TextBlock Grid.Row="5" Grid.Column="1" FontSize="12" Margin="10,12" TextAlignment="Left" VerticalAlignment="Center" Foreground="#FF474747"
+                   Text="60 Second" />
       </Grid>
     </Grid>
 
-    <Grid Grid.Column="1" Name="liveTile2" HorizontalAlignment="Right" Height="145" VerticalAlignment="Top" Width="246" Grid.RowSpan="2" Background="#FF00AED3" Margin="0,145,-269,0">
-      <StackPanel Margin="5">
-        <TextBlock Foreground="Black" Text="{Binding Name}" FontSize="20" />
-        <TextBlock Foreground="White" Text="{Binding Price}" FontSize="20" />
-        <TextBlock Foreground="White" Text="{Binding TrendTick}" FontSize="20" />
-        <TextBlock Foreground="White" Text="{Binding MovingAvg30Sec}" FontSize="20" />
-        <TextBlock Foreground="White" Text="{Binding MovingAvg1Min}" FontSize="20" />
-      </StackPanel>
-    </Grid>
   </Grid>
 </Page>
