@@ -38,8 +38,9 @@ namespace StockTiles
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             _stockData = new[] { 
-                new StockData() { Name = "MSFT", OpenPrice = 34.50, variance = 0.05 }, 
-                new StockData() { Name = "AAPL", OpenPrice = 490.0, variance = 0.1 },
+                new StockData() { Name = "MSFT", OpenPrice = 34.50, variance = 0.10 }, 
+                new StockData() { Name = "AAPL", OpenPrice = 490.0, variance = 3.50 },
+                new StockData() { Name = "NOK", OpenPrice = 4.0, variance = 0.03 },
             };
 
             itemGridView.ItemsSource = _stockData;
@@ -58,7 +59,6 @@ namespace StockTiles
             // to connect to a real stock ticker, perhaps over websockets, could do:
             // var stockObs = await WebSocketSubject.Create("ws://localhost:8080", stock.Name);
             // ... use stockObs instead of 'ticker'
- 
 
             ticker
                 .ObserveOnDispatcher()
@@ -83,7 +83,7 @@ namespace StockTiles
 
 
             ticker
-                .MovingAverage(TimeSpan.FromSeconds(30))
+                .MovingAverage(TimeSpan.FromSeconds(60))
                 .ObserveOnDispatcher()
                 .Subscribe(
                     x => stock.MovingAvg1Min = String.Format("{0:0.00}", x)
@@ -119,14 +119,16 @@ namespace StockTiles
         }
 
         #region GenerateNextDelta
+        // note: unit of variance is the same as stock price (i.e., dollar change)
+        // return value is also dollar change
         private static double GenerateNextDelta(double randValue, double variance)
         {
             var newVal = 0.0;
 
             if (randValue > .95)
-                newVal = variance * 10;
+                newVal = variance * 3;
             else if (randValue > .90)
-                newVal = -variance * 10;
+                newVal = -variance * 3;
             else if (randValue > .50)
                 newVal = variance * randValue;
             else
