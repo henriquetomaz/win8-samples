@@ -37,71 +37,101 @@ namespace StockTiles
 
         private void UpdateValue(StockData stock, double newValue)
         {
-            var delta = newValue - stock.Price;
-            stock.Price = newValue;
 
-            Debug.WriteLine("new price: {0},    delta: {1}", stock.Price, delta);
-            double percentChange = Math.Round(delta / stock.Price * 100, 1);
-
-            var icon = delta < 0 ? TREND_DOWN : TREND_UP;
-
-            stock.TrendTick = String.Format("{0}   {1:0.00}  ({2:0.0%})  ", icon, delta, delta / stock.Price);
         }
 
-        public void UpdateMovingAvg(StockData stock, double newValue)
+        // MSFT 
+        // 34 (^ 0.1  5%  since open)
+        // ^ 0.1 (last tick)
+        //
+        // moving averages
+        // 33  (30 second)
+        // 33.5 (60 second)
+
+        // [Aggregate]
+        // ^ 5%  (since open)
+        // ^ 10% (60 second)
+
+        private static string FormatDelta(double oldPrice, double newPrice, bool showPercent = false)
+        {
+            var delta = newPrice - oldPrice;
+
+            Debug.WriteLine("new price: {0},    delta: {1}", newPrice, delta);
+
+            #region Triangle display
+            string triangle;
+            if (showPercent)
+                triangle = delta < 0 ? TREND_DOWN : TREND_UP;
+            else
+                triangle = delta < 0 ? TREND_DOWN_SMALL : TREND_UP_SMALL;
+            #endregion
+
+            string percentString = showPercent ? String.Format("{0:0.0%}", delta / oldPrice) : "";
+
+            return String.Format("{0}   {1:0.00}   {2:0.0%}", triangle, Math.Abs(delta), percentString);
+        }
+
+        private string FormatMovingAvg(StockData stock, double newValue)
         {
             Debug.WriteLine("new moving average: {0}", newValue);
 
             //double percentChange = Math.Round(delta / stock.Price * 100, 1);
             double delta = newValue - stock.OpenPrice;
-
             var icon = delta < 0 ? TREND_DOWN : TREND_UP;
-
-            stock.MovingAvg30Sec = String.Format("{0}   {1:0.00}  ({2:0.0%})  ", icon, delta, newValue);
+            return String.Format("{0}   {1:0.00}  ({2:0.0%})  ", icon, delta, newValue);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            var data1 = new StockData()
-            {
+            var data1 = new StockData() {
                 Name = "MSFT",
-                Price = 34.50,
+                OpenPrice = 34.50,
+                variance = 0.05,
             };
 
-            var data2 = new StockData()
-            {
+            var data2 = new StockData() {
                 Name = "AAPL",
-                Price = 500.0,
+                OpenPrice = 490.0,
+                variance = 0.1,
             };
 
             var dataList = new[] { data1, data2 };
             itemGridView.ItemsSource = dataList;
 
-            var obs1 = GetSimulatedTicker(34, 0.05).Publish().RefCount();
-            var obs2 = GetSimulatedTicker(500, 0.01).Publish().RefCount();
-            
-            obs1.ObserveOnDispatcher().Subscribe(x => UpdateValue(data1, x));
-            
-            obs2.ObserveOnDispatcher().Subscribe(x => UpdateValue(data2, x));
+            foreach (var item in dataList) {
+                CreateObservable(item);
+            }
+        }
 
-            //var q = from w in obs1.Window(TimeSpan.FromMilliseconds(1000))
-            //        from x in w.Average()
-            //        select x;
+        private void CreateObservable(StockData stock)
+        {
+            var ticker = GetSimulatedTicker(stock.OpenPrice, stock.variance);
 
-            obs1.Window(TimeSpan.FromMilliseconds(30000), TimeSpan.FromMilliseconds(1000))
+            ticker
+                .ObserveOnDispatcher()
+                .Subscribe(
+                    x => {
+                        stock.OpenDelta = FormatDelta(stock.OpenPrice, x, showPercent: true);
+                        stock.TickDelta = FormatDelta(stock.Price, x);
+                        stock.Price = x;
+                    }
+                );
+
+            ticker
+                .Window(TimeSpan.FromSeconds(30), TimeSpan.FromMilliseconds(1000))  // 30 second moving average that moves forward every second
                 .SelectMany(x => x.Average())
-                .ObserveOnDispatcher().Subscribe(x => UpdateMovingAvg(data1, x));
+                .ObserveOnDispatcher()
+                .Subscribe(
+                    x => stock.MovingAvg30Sec = String.Format("{0:0.00}", x)
+                );
 
-
-            //var nextVal1 = obs1.Skip(1);
-            //obs1.Zip(nextVal1, (prev, curr) => curr - prev)
-            //    .ObserveOnDispatcher()
-            //    .Subscribe(x => UpdateTrend(data1, x));
-
-            
-
-            //var stockObs = await WebSocketSubject.Create("ws://localhost:8080");
-            //stockObs.Subscribe(next => Debug.WriteLine(next));
+            ticker
+                .Window(TimeSpan.FromSeconds(60), TimeSpan.FromMilliseconds(1000))  // 60 second moving average that moves forward every second
+                .SelectMany(x => x.Average())
+                .ObserveOnDispatcher()
+                .Subscribe(
+                    x => stock.MovingAvg1Min = String.Format("{0:0.00}", x)
+                );
         }
 
         public static IObservable<double> GetSimulatedTicker(double initialValue, double variance)
@@ -124,8 +154,11 @@ namespace StockTiles
 
                         return Math.Round(newVal, 2);
                     })
-                    .Scan(initialValue, (acc, current) => acc + current);
+                    .Scan(initialValue, (acc, current) => acc + current)
+                    .Publish()
+                    .RefCount();
         }
+
 
         //var prices = Observable.Generate(
         //    5d,
@@ -136,34 +169,7 @@ namespace StockTiles
         //);
     
 
-        //private IObservable<double> GetStockObservable(string tickerSymbol)
-        //{
-        //    /* Subscribe to the StockTickerWatcher for the particular symbol. 
-        //       To display, throttle based on what the update frequency should be.
-        //       To detect a spike/dip in the stock price, have a different observable that 
-        //     * keeps some number of events. (use scan?  buffer?  window?)
-        //     * Have another observable source that combines all the stock updates and displays the
-        //     * percent changed in the total portfolio.
-        //     * Then also add an observable that detects big changes.
-        //     * 
-        //     * 
-        //     */
-        //     up or down: since open, tick, 5 seconds, 10 seconds
         //     percentage changed over all stocks
-        //}
     }
 
-    //class StockTickerWatcher
-    //{
-    //    /* Connect to the stock ticker service and get ticker results for whatever ticker symbols have 
-    //     * been requested to date. If service pushes new data, just use OnNext there. If service must be
-    //     * polled, then poll based on an observable.interval(timespan)
-    //     * ? (Can also cache results from each tick response)
-    //    */
-
-    //    public IObservable<Tuple<string, double>> getStockObservable()
-    //    {
-    //        var observable = 
-    //    }
-    //}
 }

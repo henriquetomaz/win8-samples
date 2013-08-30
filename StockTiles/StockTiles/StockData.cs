@@ -11,7 +11,8 @@ namespace StockTiles
     public class StockData : INotifyPropertyChanged
     {
         private double _price;
-        private string _trendTick;
+        private string _openDelta;
+        private string _tickDelta;
         private string _trend30Sec;
         private string _trend1Min;
 
@@ -26,12 +27,21 @@ namespace StockTiles
                 SetProperty(ref _price, value);
             }
         }
-        public string TrendTick
+
+        public string OpenDelta
         {
-            get { return _trendTick; }
+            get { return _openDelta; }
             set
             {
-                SetProperty(ref _trendTick, value);
+                SetProperty(ref _openDelta, value);
+            }
+        }
+        public string TickDelta
+        {
+            get { return _tickDelta; }
+            set
+            {
+                SetProperty(ref _tickDelta, value);
             }
         }
 
@@ -64,6 +74,8 @@ namespace StockTiles
                 }
             }
         }
+
+        public double variance;
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

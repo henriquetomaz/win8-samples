@@ -7,14 +7,9 @@
     x:Class="StockTiles.MainPage"
     mc:Ignorable="d">
 
-    <!-- Horizontal scrolling grid -->
+  <!-- Horizontal scrolling grid -->
   <GridView
             x:Name="itemGridView"
-            AutomationProperties.AutomationId="ItemGridView"
-            AutomationProperties.Name="Items In Group"
-            TabIndex="1"
-            Grid.RowSpan="2"
-            Padding="105,126,120,50"
             SelectionMode="None"
             IsSwipeEnabled="false"
             Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
