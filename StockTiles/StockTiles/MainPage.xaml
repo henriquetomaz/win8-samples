@@ -7,21 +7,22 @@
     x:Class="StockTiles.MainPage"
     mc:Ignorable="d">
 
-  <!-- Horizontal scrolling grid -->
-  <GridView
-            x:Name="itemGridView"
-            SelectionMode="None"
-            IsSwipeEnabled="false"
-            IsItemClickEnabled="True"
-            Margin="40">
-    <GridView.Background>
+  <StackPanel>
+    <StackPanel.Background>
       <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="Black" Offset="0.067"/>
         <GradientStop Color="White" Offset="1"/>
       </LinearGradientBrush>
-    </GridView.Background>
+    </StackPanel.Background>
 
-    <GridView.ItemsPanel>
+    <!-- Horizontal scrolling grid -->
+    <GridView
+            x:Name="itemGridView"
+            SelectionMode="None"
+            IsSwipeEnabled="false"
+            IsItemClickEnabled="True">
+
+      <GridView.ItemsPanel>
       <ItemsPanelTemplate>  
         <WrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5" />
       </ItemsPanelTemplate>
@@ -60,7 +61,7 @@
                        Text="{Binding OpenDelta}" FontSize="18" FontWeight="SemiBold" Margin="40,10,10,10" TextAlignment="Left" VerticalAlignment="Bottom"/>
           </Grid>
 
-          <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Foreground="#FFF8A429" 
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Foreground="#FFFFAF39" 
                    Text="{Binding Name}" 
                    FontSize="24" Margin="10" FontFamily="Segoe UI Black" FontWeight="Bold" />
 
@@ -95,5 +96,35 @@
     </GridView.ItemContainerStyle>
 
   </GridView>
+
+  <Grid Width="300" Background="#E5FFB457" Margin="40" HorizontalAlignment="Left">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="75" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="0,0,0,20">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <TextBlock x:Name="combinedTile"  Grid.Column="1" Foreground="#FF393939" Text="{Binding CombinedChange}" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Bottom" Margin="10,0,0,0"/>
+   </Grid>
+
+    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Foreground="White" 
+                Text="Combined" 
+                FontSize="24" Margin="10" FontFamily="Segoe UI Black" FontWeight="Bold" />
+  </Grid>
+
+  </StackPanel>
 
 </Page>

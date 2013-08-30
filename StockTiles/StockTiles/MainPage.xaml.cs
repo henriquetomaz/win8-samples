@@ -21,30 +21,122 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace StockTiles
-{
+{   
     public sealed partial class MainPage : Page
     {
         const string TREND_UP = "▲";
         const string TREND_DOWN = "▼";
+
+        private CombinedData _combinedStats = new CombinedData();
+        private StockData[] _stockData;
 
         public MainPage()
         {
             this.InitializeComponent();
         }
 
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            _stockData = new[] { 
+                new StockData() { Name = "MSFT", OpenPrice = 34.50, variance = 0.05 }, 
+                new StockData() { Name = "AAPL", OpenPrice = 490.0, variance = 0.1 },
+            };
 
-        // MSFT 
-        // ^34 (+ 0.1  +5%  since open)
-        // 0.1 (last tick)
-        //
-        // moving averages
-        // 33  (30 second)
-        // 33.5 (60 second)
+            itemGridView.ItemsSource = _stockData;
 
-        // [Aggregate]
-        // ^ 5%  (since open)
-        // ^ 10% (60 second)
+            foreach (var item in _stockData) {
+                InitializeObservable(item);
+            }
 
+            combinedTile.DataContext = _combinedStats;
+        }
+
+        private void InitializeObservable(StockData stock)
+        {
+            var ticker = GetSimulatedTicker(stock.OpenPrice, stock.variance);
+
+            // to connect to a real stock ticker, perhaps over websockets, could do:
+            // var stockObs = await WebSocketSubject.Create("ws://localhost:8080", stock.Name);
+            // ... use stockObs instead of 'ticker'
+ 
+
+            ticker
+                .ObserveOnDispatcher()
+                .Subscribe(
+                    x => {
+                        stock.OpenDelta = FormatDelta(stock.OpenPrice, x, showPercent: true);
+                        stock.UpDownIcon = (x - stock.OpenPrice <= 0) ? TREND_DOWN : TREND_UP;
+                        stock.TickDelta = FormatDelta(stock.Price, x);
+                        stock.Price = x;
+                        stock.PriceString = String.Format("{0:0.00}", x);
+                        UpdateCombinedStats();
+                    }
+                );
+
+
+            ticker
+                .MovingAverage(TimeSpan.FromSeconds(30)) // 30 second moving average that moves forward every second
+                .ObserveOnDispatcher()
+                .Subscribe(
+                    x => stock.MovingAvg30Sec = String.Format("{0:0.00}", x)
+                );
+
+
+            ticker
+                .MovingAverage(TimeSpan.FromSeconds(30))
+                .ObserveOnDispatcher()
+                .Subscribe(
+                    x => stock.MovingAvg1Min = String.Format("{0:0.00}", x)
+                );
+        }
+
+        private void UpdateCombinedStats()
+        {
+            var combined =
+                _stockData
+                    .Select(stock => (stock.Price - stock.OpenPrice) / stock.OpenPrice)
+                    .Average();
+
+            _combinedStats.CombinedChange = String.Format("{0:0.0%}", combined);
+            Debug.WriteLine("combined change: {0}", _combinedStats.CombinedChange);
+        }
+
+        public static IObservable<double> GetSimulatedTicker(double initialValue, double variance)
+        {
+            Random random = new Random();
+
+            var deltas = Observable.Generate(
+                initialState: 0d,
+                condition: x => true,
+                iterate: x => GenerateNextDelta(random.NextDouble(), variance),
+                resultSelector: x => x,
+                timeSelector: x => TimeSpan.FromMilliseconds(1000)
+            );
+
+            return deltas.Scan(initialValue, (acc, current) => acc + current)
+                    .Publish()
+                    .RefCount();
+        }
+
+        #region GenerateNextDelta
+        private static double GenerateNextDelta(double randValue, double variance)
+        {
+            var newVal = 0.0;
+
+            if (randValue > .95)
+                newVal = variance * 10;
+            else if (randValue > .90)
+                newVal = -variance * 10;
+            else if (randValue > .50)
+                newVal = variance * randValue;
+            else
+                newVal = -variance * randValue;
+
+            return Math.Round(newVal, 2);
+        }
+        #endregion
+
+        #region FormatDelta
         private static string FormatDelta(double oldPrice, double newPrice, bool showPercent = false)
         {
             var delta = Math.Round(newPrice - oldPrice, 2);
@@ -52,105 +144,19 @@ namespace StockTiles
 
             return String.Format("{0:+0.00;-0.00}   {1}", delta, percentString);
         }
+        #endregion 
 
-        private static string FormatUpDownIcon(double delta)
+        //     TODO: percentage changed over all stocks
+    }
+
+    public static class Extension 
+    {
+        public static IObservable<double> MovingAverage(this IObservable<double> self, TimeSpan duration)
         {
-            return delta < 0 ? TREND_DOWN : TREND_UP;
+            return self
+                    .Window(duration, TimeSpan.FromMilliseconds(1000))  // X second moving average that moves forward every second
+                    .SelectMany(x => x.Average());
         }
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            var data1 = new StockData() {
-                Name = "MSFT",
-                OpenPrice = 34.50,
-                variance = 0.05,
-            };
-
-            var data2 = new StockData() {
-                Name = "AAPL",
-                OpenPrice = 490.0,
-                variance = 0.1,
-            };
-
-            var dataList = new[] { data1, data2 };
-            itemGridView.ItemsSource = dataList;
-
-            foreach (var item in dataList) {
-                CreateObservable(item);
-            }
-        }
-
-        private void CreateObservable(StockData stock)
-        {
-            var ticker = GetSimulatedTicker(stock.OpenPrice, stock.variance);
-
-            ticker
-                .ObserveOnDispatcher()
-                .Subscribe(
-                    x => {
-                        stock.OpenDelta = FormatDelta(stock.OpenPrice, x, showPercent: true);
-                        stock.UpDownIcon = FormatUpDownIcon(x - stock.Price);
-                        stock.TickDelta = FormatDelta(stock.Price, x);
-                        stock.Price = x;
-                        stock.PriceString = String.Format("{0:0.00}", x);
-                    }
-                );
-
-            ticker
-                .Window(TimeSpan.FromSeconds(30), TimeSpan.FromMilliseconds(1000))  // 30 second moving average that moves forward every second
-                .SelectMany(x => x.Average())
-                .ObserveOnDispatcher()
-                .Subscribe(
-                    x => stock.MovingAvg30Sec = String.Format("{0:0.00}", x)
-                );
-
-            ticker
-                .Window(TimeSpan.FromSeconds(60), TimeSpan.FromMilliseconds(1000))  // 60 second moving average that moves forward every second
-                .SelectMany(x => x.Average())
-                .ObserveOnDispatcher()
-                .Subscribe(
-                    x => stock.MovingAvg1Min = String.Format("{0:0.00}", x)
-                );
-        }
-
-        public static IObservable<double> GetSimulatedTicker(double initialValue, double variance)
-        {
-            Random random = new Random();
-
-            return Observable
-                    .Interval(TimeSpan.FromMilliseconds(1000))
-                    .Select(x =>
-                    {
-                        var nextRand = random.NextDouble();
-                        var newVal = 0.0;
-
-                        if (nextRand > .95)
-                            newVal = variance * 10;
-                        else if (nextRand > .90)
-                            newVal = -variance * 10;
-                        else if (nextRand > .50)
-                            newVal = variance * nextRand;
-                        else
-                            newVal = -variance * nextRand;
-
-                        return Math.Round(newVal, 2);
-                    })
-                    .Scan(initialValue, (acc, current) => acc + current)
-                    .Publish()
-                    .RefCount();
-        }
-
-
-        //var prices = Observable.Generate(
-        //    5d,
-        //    i => i > 0,
-        //    i => i + rand.NextDouble() - 0.5,
-        //    i => i,
-        //    i => TimeSpan.FromSeconds(0.1)
-        //);
-    
-
-        //     percentage changed over all stocks
     }
 
 }

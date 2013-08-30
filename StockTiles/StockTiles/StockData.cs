@@ -100,4 +100,31 @@ namespace StockTiles
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
+
+    public class CombinedData : INotifyPropertyChanged 
+    {
+        private string _combinedChange;
+
+        public string CombinedChange
+        {
+            get { return _combinedChange; }
+            set
+            {
+                SetProperty(ref _combinedChange, value);
+            }
+        }
+
+        private void SetProperty<T>(ref T field, T value, [CallerMemberName] string name = "")
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, value)) {
+                field = value;
+                var handler = PropertyChanged;
+                if (handler != null) {
+                    handler(this, new PropertyChangedEventArgs(name));
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
 }
