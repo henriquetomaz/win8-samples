@@ -28,12 +28,14 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock x:Name="InputTextBlock"  TextWrapping="Wrap" Grid.Row="0" Style="{StaticResource BasicTextStyle}" HorizontalAlignment="Left" Text="Registers an event listener for accelerometer data and displays the X, Y and Z acceleration values as they are reported." />
-            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Grid.Row="1">
-                <Button x:Name="ScenarioEnableButton" Content="Enable" Margin="0,0,10,0" Click="ScenarioEnable"/>
+            <TextBlock x:Name="InputTextBlock"  TextWrapping="Wrap" Grid.Row="0" Style="{StaticResource BasicTextStyle}" Text="Registers an event listener for accelerometer data and displays the X, Y and Z acceleration values as they are reported." Margin="0,0,1,0" />
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Grid.Row="1" RenderTransformOrigin="0.502,1.631">
+                <Button x:Name="ScenarioEnableButton" Content="Enable" Margin="0,0,10,0" Click="ScenarioEnable" VerticalAlignment="Bottom"/>
                 <Button x:Name="ScenarioDisableButton"  Content="Disable" Margin="0,0,10,0" Click="ScenarioDisable"/>
             </StackPanel>
+            <CheckBox x:Name="SimulateDataCheckbox" Grid.Row="2" Margin="0,0,10,0" Content="Simulate Accelerometer" Click="SimulateDataCheckbox_Click"/>
         </Grid>
 
         <Grid x:Name="Output" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1">
@@ -60,7 +62,7 @@
                 <Line x:Name="zLine" X1="240" Y1="150" X2="190" Y2="200" Stroke="Blue" StrokeThickness="4"></Line>
             </Grid>
         </Grid>
-        
+
         <!-- Add Storyboards to the visual states below as necessary for supporting the various layouts -->
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>

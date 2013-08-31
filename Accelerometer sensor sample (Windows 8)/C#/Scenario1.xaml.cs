@@ -46,27 +46,29 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
 
         private void Enable()
         {
-            Window.Current.VisibilityChanged += new WindowVisibilityChangedEventHandler(VisibilityChanged);
+            Window.Current.VisibilityChanged += VisibilityChanged;
 
-#if TEST
-            var obs = EmulateSensor.Emulate();
-            _subscription =
-                obs.ObserveOnDispatcher()
-                    .Subscribe(UpdateUI);
-
-            //AccelerometerObservable.FindBigMovements(obs).Subscribe(Update2);
-#else
-            _subscription =
-                AccelerometerObservable.Instance
-                    .Sample(TimeSpan.FromMilliseconds(100))
-                    .ObserveOnDispatcher()
-                    .Subscribe(UpdateUI);
-#endif
+            if (SimulateDataCheckbox.IsChecked.GetValueOrDefault(false))
+            {
+                //AccelerometerObservable.FindBigMovements(obs).Subscribe(Update2);
+                _subscription =
+                    EmulateSensor.Emulate()
+                        .ObserveOnDispatcher()
+                        .Subscribe(UpdateUI);
+            }
+            else
+            {
+                _subscription =
+                    AccelerometerObservable.Instance
+                        .Sample(TimeSpan.FromMilliseconds(100))
+                        .ObserveOnDispatcher()
+                        .Subscribe(UpdateUI);
+            }
         }
 
         private void Disable()
         {
-            Window.Current.VisibilityChanged -= new WindowVisibilityChangedEventHandler(VisibilityChanged);
+            Window.Current.VisibilityChanged -= VisibilityChanged;
 
             if (_subscription != null) {
                 _subscription.Dispose();
@@ -117,6 +119,14 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
 
             ScenarioEnableButton.IsEnabled = true;
             ScenarioDisableButton.IsEnabled = false;
+        }
+
+        private void SimulateDataCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (ScenarioEnableButton.IsEnabled)
+                Enable();   // switch between simulated and real accelerometer data
+            else
+                Disable();
         }
     }
 }
