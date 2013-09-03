@@ -97,7 +97,6 @@ namespace SensorData
                 _accelObs =
                     Observable.FromEventPattern<ReadingChangedHandler, AccelerometerReadingChangedEventArgs>
                     (subscribeEvent, unsubscribeEvent)
-                    //.Do(l => Debug.WriteLine("Publishing {0}", l.EventArgs.Reading.Timestamp)) //side effect to show it is running
                     .Select(x => ToVector(x.EventArgs.Reading))
                     .Publish()
                     .RefCount();

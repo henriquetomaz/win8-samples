@@ -23,7 +23,6 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
     {
         MainPage rootPage = MainPage.Current;
         IDisposable readingSubscription = Disposable.Empty;
-        IDisposable visibilitySubscription = Disposable.Empty;
         BehaviorSubject<bool> isEnabled = new BehaviorSubject<bool>(true);
         ReactiveCommand enableCommand, disableCommand, simulateData;
 
@@ -70,18 +69,6 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         private void Enable()
         {
             Window.Current.VisibilityChanged += VisibilityChanged;
-            //var visibilityChanged = Observable.FromEventPattern(Window.Current, "VisibilityChanged");
-            //visibilitySubscription =
-            //    visibilityChanged.Subscribe(
-            //        ev => {
-            //            if (ScenarioEnableButton.IsEnabled) {
-            //                if (ev.Visible)
-            //                    Enable();
-            //                else
-            //                    Disable();
-            //            }
-            //        }                    
-            //    );
 
             if (SimulateDataCheckbox.IsChecked.GetValueOrDefault(false))
             {
@@ -115,6 +102,7 @@ namespace Microsoft.Samples.Devices.Sensors.AccelerometerSample
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             isEnabled.OnNext(false);
+            Disable();
 
             base.OnNavigatingFrom(e);
         }
